@@ -5,65 +5,28 @@ from streamlit_extras.add_vertical_space import add_vertical_space
 import asyncio
 from EdgeGPT import Chatbot, ConversationStyle
 
-st.set_page_config(page_title="EdgeChat - An LLM-powered Streamlit app")
+import streamlit as st
+import asyncio
+from EdgeGPT import Chatbot, ConversationStyle
 
-# Sidebar contents
-with st.sidebar:
-    st.title('🤗💬 EdgeChat App')
-    st.markdown('''
-    ## About
-    This app is an LLM-powered chatbot built using:
-    - [Streamlit](https://streamlit.io/)
-    - [EdgeGPT](https://github.com/acheong08/EdgeGPT)
-    
-    💡 Note: No API key required!
-    ''')
-    add_vertical_space(5)
-    st.write('Made with by Danyaal Majid')
-
-# Generate empty lists for generated and past.
-## generated stores AI generated responses
-if 'generated' not in st.session_state:
-    st.session_state['generated'] = ["I'm EdgeChat, How may I help you?"]
-## past stores User's questions
-if 'past' not in st.session_state:
-    st.session_state['past'] = ['Hi!']
-
-# Layout of input/response containers
-input_container = st.container()
-colored_header(label='', description='', color_name='blue-30')
-response_container = st.container()
-
-# User input
-## Function for taking user provided prompt as input
-def get_text():
-    input_text = st.text_input("You: ", "", key="input")
-    return input_text
-## Applying the user input box
-with input_container:
-    user_input = get_text()
-
-# Response output
-## Function for taking user prompt as input followed by producing AI generated responses
-def generate_response(prompt):
-    chatbot = hugchat.ChatBot()
-    response = chatbot.chat(prompt)
-    return response
-
-async def main(user_input):
+async def main():
     bot = await Chatbot.create() # Passing cookies is optional
-    response = await bot.ask(prompt= user_input, conversation_style=ConversationStyle.precise)
-    await bot.close()
-    return response
+    conversation_style = ConversationStyle.creative
+    st.title("EdgeGPT Chatbot")
 
-## Conditional display of AI generated responses as a function of user provided prompts
-with response_container:
-    if user_input:
-        response = asyncio.run(main(user_input))
-        st.session_state.past.append(user_input)
-        st.session_state.generated.append(response)
-        
-    if st.session_state['generated']:
-        for i in range(len(st.session_state['generated'])):
-            message(st.session_state['past'][i], is_user=True, key=str(i) + '_user')
-            message(st.session_state["generated"][i], key=str(i))
+    # Define a function to handle user input and display chatbot responses
+    async def ask_chatbot(prompt):
+        response = await bot.ask(prompt=prompt, conversation_style=conversation_style)
+        return response
+
+    # Create an input field for the user to enter prompts
+    user_prompt = st.text_input("User Input", value="Hello world")
+    if st.button("Send"):
+        # Call the chatbot and display the response
+        bot_response = await ask_chatbot(user_prompt)
+        st.text_area("Chatbot Response", value=bot_response, height=200)
+
+    await bot.close()
+
+if __name__ == "__main__":
+    asyncio.run(main())
