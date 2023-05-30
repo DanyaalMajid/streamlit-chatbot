@@ -2,29 +2,29 @@ import streamlit as st
 from streamlit_chat import message
 from streamlit_extras.colored_header import colored_header
 from streamlit_extras.add_vertical_space import add_vertical_space
-from hugchat import hugchat
+import asyncio
+from EdgeGPT import Chatbot, ConversationStyle
 
-st.set_page_config(page_title="HugChat - An LLM-powered Streamlit app")
+st.set_page_config(page_title="EdgeChat - An LLM-powered Streamlit app")
 
 # Sidebar contents
 with st.sidebar:
-    st.title('🤗💬 HugChat App')
+    st.title('🤗💬 EdgeChat App')
     st.markdown('''
     ## About
     This app is an LLM-powered chatbot built using:
     - [Streamlit](https://streamlit.io/)
-    - [HugChat](https://github.com/Soulter/hugging-chat-api)
-    - [OpenAssistant/oasst-sft-6-llama-30b-xor](https://huggingface.co/OpenAssistant/oasst-sft-6-llama-30b-xor) LLM model
+    - [EdgeGPT](https://github.com/acheong08/EdgeGPT)
     
     💡 Note: No API key required!
     ''')
     add_vertical_space(5)
-    st.write('Made with ❤️ by [Data Professor](https://youtube.com/dataprofessor)')
+    st.write('Made with by Danyaal Majid')
 
 # Generate empty lists for generated and past.
 ## generated stores AI generated responses
 if 'generated' not in st.session_state:
-    st.session_state['generated'] = ["I'm HugChat, How may I help you?"]
+    st.session_state['generated'] = ["I'm EdgeChat, How may I help you?"]
 ## past stores User's questions
 if 'past' not in st.session_state:
     st.session_state['past'] = ['Hi!']
@@ -50,10 +50,16 @@ def generate_response(prompt):
     response = chatbot.chat(prompt)
     return response
 
+async def main(user_input):
+    bot = await Chatbot.create() # Passing cookies is optional
+    response = await bot.ask(prompt= user_input, conversation_style=ConversationStyle.precise)
+    await bot.close()
+    return response
+
 ## Conditional display of AI generated responses as a function of user provided prompts
 with response_container:
     if user_input:
-        response = generate_response(user_input)
+        response = asyncio.run(main(user_input))
         st.session_state.past.append(user_input)
         st.session_state.generated.append(response)
         
