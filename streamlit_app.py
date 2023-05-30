@@ -17,7 +17,7 @@ async def main():
     # Define a function to handle user input and display chatbot responses
     async def ask_chatbot(prompt):
         response = await bot.ask(prompt=prompt, conversation_style=conversation_style)
-        return response["message"]
+        return response
 
     # Create an input field for the user to enter prompts
     user_prompt = st.text_input("User Input", value="Hello world")
