@@ -16,7 +16,7 @@ async def main():
 
     # Define a function to handle user input and display chatbot responses
     async def ask_chatbot(prompt):
-        response = await bot.ask(prompt=prompt, conversation_style=conversation_style)
+        response = await bot.ask(prompt=prompt, conversation_style=conversation_style.precise)
         final_msg = response["item"]["result"]["message"]
         return final_msg
 
@@ -25,7 +25,8 @@ async def main():
     if st.button("Send"):
         # Call the chatbot and display the response
         bot_response = await ask_chatbot(user_prompt)
-        st.text_area("Chatbot Response", value=bot_response, height=200)
+        message(user_prompt,is_user=True)
+        message(bot_response)
 
     await bot.close()
 
